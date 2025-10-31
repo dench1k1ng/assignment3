@@ -6,9 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
-/**
- * JUnit tests for DAG Shortest and Longest Paths algorithms.
- */
 public class DAGShortestPathTest {
 
     private Metrics metrics;
@@ -20,8 +17,7 @@ public class DAGShortestPathTest {
 
     @Test
     void testSimpleShortestPath() {
-        // Create DAG: 0 -> 1 (weight 5), 0 -> 2 (weight 3), 1 -> 3 (weight 2), 2 -> 3
-        // (weight 4)
+
         Graph dag = new Graph(4, true);
         dag.addEdge(0, 1, 5);
         dag.addEdge(0, 2, 3);
@@ -31,19 +27,16 @@ public class DAGShortestPathTest {
         DAGShortestPath shortestPath = new DAGShortestPath(dag, metrics);
         PathResult result = shortestPath.findShortestPaths(0);
 
-        // Check distances
         assertEquals(0.0, result.getDistance(0), 0.001);
         assertEquals(5.0, result.getDistance(1), 0.001);
         assertEquals(3.0, result.getDistance(2), 0.001);
-        assertEquals(7.0, result.getDistance(3), 0.001); // min(5+2, 3+4) = 7
+        assertEquals(7.0, result.getDistance(3), 0.001);
 
-        // Check paths
         assertEquals(List.of(0), result.getPath(0));
         assertEquals(List.of(0, 1), result.getPath(1));
         assertEquals(List.of(0, 2), result.getPath(2));
-        assertEquals(List.of(0, 1, 3), result.getPath(3)); // Shortest path to 3
+        assertEquals(List.of(0, 1, 3), result.getPath(3));
 
-        // Check reachability
         assertTrue(result.isReachable(0));
         assertTrue(result.isReachable(1));
         assertTrue(result.isReachable(2));
@@ -52,7 +45,7 @@ public class DAGShortestPathTest {
 
     @Test
     void testSimpleLongestPath() {
-        // Same DAG as above
+
         Graph dag = new Graph(4, true);
         dag.addEdge(0, 1, 5);
         dag.addEdge(0, 2, 3);
@@ -62,13 +55,11 @@ public class DAGShortestPathTest {
         DAGLongestPath longestPath = new DAGLongestPath(dag, metrics);
         PathResult result = longestPath.findLongestPaths(0);
 
-        // Check distances
         assertEquals(0.0, result.getDistance(0), 0.001);
         assertEquals(5.0, result.getDistance(1), 0.001);
         assertEquals(3.0, result.getDistance(2), 0.001);
-        assertEquals(7.0, result.getDistance(3), 0.001); // max(5+2, 3+4) = 7
+        assertEquals(7.0, result.getDistance(3), 0.001);
 
-        // Check critical path
         assertTrue(result.isLongestPath());
         List<Integer> criticalPath = result.getCriticalPath();
         assertNotNull(criticalPath);
@@ -77,7 +68,7 @@ public class DAGShortestPathTest {
 
     @Test
     void testUnreachableVertices() {
-        // Create disconnected DAG: 0->1, 2->3
+
         Graph dag = new Graph(4, true);
         dag.addEdge(0, 1, 3);
         dag.addEdge(2, 3, 2);
@@ -85,23 +76,20 @@ public class DAGShortestPathTest {
         DAGShortestPath shortestPath = new DAGShortestPath(dag, metrics);
         PathResult result = shortestPath.findShortestPaths(0);
 
-        // Check reachability
         assertTrue(result.isReachable(0));
         assertTrue(result.isReachable(1));
         assertFalse(result.isReachable(2));
         assertFalse(result.isReachable(3));
 
-        // Check distances
         assertEquals(0.0, result.getDistance(0), 0.001);
         assertEquals(3.0, result.getDistance(1), 0.001);
         assertTrue(Double.isInfinite(result.getDistance(2)));
         assertTrue(Double.isInfinite(result.getDistance(3)));
 
-        // Check paths
         assertNotNull(result.getPath(0));
         assertNotNull(result.getPath(1));
-        assertNull(result.getPath(2)); // Unreachable
-        assertNull(result.getPath(3)); // Unreachable
+        assertNull(result.getPath(2));
+        assertNull(result.getPath(3));
     }
 
     @Test
@@ -118,7 +106,7 @@ public class DAGShortestPathTest {
 
     @Test
     void testCriticalPathFinding() {
-        // Create complex DAG for critical path testing
+
         Graph dag = new Graph(6, true);
         dag.addEdge(0, 1, 3);
         dag.addEdge(0, 2, 2);
@@ -138,7 +126,6 @@ public class DAGShortestPathTest {
         List<Integer> criticalPath = criticalResult.getCriticalPath();
         assertNotNull(criticalPath);
 
-        // Critical path should be 0->2->4->5 with length 10
         assertEquals(10.0, criticalResult.getCriticalPathLength(), 0.001);
     }
 
@@ -158,7 +145,7 @@ public class DAGShortestPathTest {
 
     @Test
     void testCyclicGraphThrows() {
-        // Create cyclic graph
+
         Graph cyclic = new Graph(3, true);
         cyclic.addEdge(0, 1);
         cyclic.addEdge(1, 2);
@@ -194,7 +181,6 @@ public class DAGShortestPathTest {
         DAGShortestPath shortestPath = new DAGShortestPath(dag, metrics);
         shortestPath.findShortestPaths(0);
 
-        // Verify metrics were tracked
         assertTrue(metrics.getCounter("vertex_relaxations") > 0);
         assertTrue(metrics.getCounter("edge_relaxations") > 0);
         assertTrue(metrics.getTime("dag_shortest_paths") > 0);
@@ -212,7 +198,6 @@ public class DAGShortestPathTest {
         assertEquals(0, result.getSource());
         assertTrue(result.isLongestPath());
 
-        // Test critical path methods
         assertEquals(2, result.getCriticalPathTarget());
         assertEquals(List.of(0, 1, 2), result.getCriticalPath());
         assertEquals(8.0, result.getCriticalPathLength(), 0.001);

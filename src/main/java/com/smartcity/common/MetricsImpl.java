@@ -3,7 +3,6 @@ package com.smartcity.common;
 import java.util.HashMap;
 import java.util.Map;
 
-
 public class MetricsImpl implements Metrics {
 
     private final Map<String, Long> counters = new HashMap<>();

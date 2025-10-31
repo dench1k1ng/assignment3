@@ -6,21 +6,11 @@ import com.smartcity.graph.topo.KahnTopologicalSort;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Single-source shortest paths algorithm for DAGs.
- * Uses topological ordering and dynamic programming.
- */
 public class DAGShortestPath {
 
     private final Graph graph;
     private final Metrics metrics;
 
-    /**
-     * Constructor for DAG shortest path algorithm.
-     * 
-     * @param graph   the DAG
-     * @param metrics metrics tracker
-     */
     public DAGShortestPath(Graph graph, Metrics metrics) {
         if (!graph.isDirected()) {
             throw new IllegalArgumentException("Algorithm requires a directed graph");
@@ -29,12 +19,6 @@ public class DAGShortestPath {
         this.metrics = metrics;
     }
 
-    /**
-     * Compute single-source shortest paths.
-     * 
-     * @param source the source vertex
-     * @return PathResult containing distances and paths
-     */
     public PathResult findShortestPaths(int source) {
         metrics.startTiming("dag_shortest_paths");
 
@@ -44,7 +28,6 @@ public class DAGShortestPath {
 
         int n = graph.getNumVertices();
 
-        // Get topological ordering
         KahnTopologicalSort topoSort = new KahnTopologicalSort();
         List<Integer> topoOrder = topoSort.topologicalSort(graph, metrics);
 
@@ -52,7 +35,6 @@ public class DAGShortestPath {
             throw new IllegalArgumentException("Graph contains cycles - not a DAG");
         }
 
-        // Initialize distances and predecessors
         double[] distances = new double[n];
         int[] predecessors = new int[n];
 
@@ -61,15 +43,13 @@ public class DAGShortestPath {
 
         distances[source] = 0.0;
 
-        // Process vertices in topological order
         for (int u : topoOrder) {
             if (Double.isInfinite(distances[u])) {
-                continue; // Skip unreachable vertices
+                continue;
             }
 
             metrics.incrementCounter("vertex_relaxations");
 
-            // Relax all outgoing edges
             for (Graph.Edge edge : graph.getEdges(u)) {
                 int v = edge.to;
                 double newDistance = distances[u] + edge.weight;
@@ -89,11 +69,6 @@ public class DAGShortestPath {
         return new PathResult(distances, predecessors, source, false);
     }
 
-    /**
-     * Get performance metrics summary.
-     * 
-     * @return formatted metrics string
-     */
     public String getMetricsSummary() {
         StringBuilder sb = new StringBuilder();
         sb.append("=== DAG Shortest Path Metrics ===\n");

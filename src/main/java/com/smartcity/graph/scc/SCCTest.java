@@ -2,28 +2,23 @@ package com.smartcity.graph.scc;
 
 import com.smartcity.common.*;
 
-/**
- * Simple test for SCC implementation.
- */
 public class SCCTest {
 
     public static void main(String[] args) {
-        // Test with small dataset
+
         try {
             System.out.println("=== Testing SCC Implementation ===\n");
 
-            // Create test graph manually (SCC: {0,1,2} and DAG: 3->4->5)
             Graph graph = new Graph(6, true);
             graph.addEdge(0, 1, 2);
             graph.addEdge(1, 2, 3);
-            graph.addEdge(2, 0, 1); // Creates SCC {0,1,2}
+            graph.addEdge(2, 0, 1);
             graph.addEdge(3, 4, 4);
-            graph.addEdge(4, 5, 2); // DAG component
+            graph.addEdge(4, 5, 2);
 
             System.out.println("Original graph:");
             System.out.println(graph);
 
-            // Run Tarjan's SCC
             Metrics metrics = new MetricsImpl();
             TarjanSCC tarjan = new TarjanSCC(graph, metrics);
             SCCResult result = tarjan.findSCC();
@@ -33,7 +28,6 @@ public class SCCTest {
 
             System.out.println(tarjan.getMetricsSummary());
 
-            // Build condensation DAG
             SCCCondensation condensation = new SCCCondensation(graph, result);
             Graph dag = condensation.buildCondensationDAG();
 

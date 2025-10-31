@@ -4,10 +4,6 @@ import com.smartcity.common.Graph;
 import com.smartcity.common.Metrics;
 import java.util.*;
 
-/**
- * Implementation of Kahn's algorithm for topological sorting.
- * Uses in-degree counting and queue-based processing.
- */
 public class KahnTopologicalSort implements TopologicalSort {
 
     @Override
@@ -21,10 +17,8 @@ public class KahnTopologicalSort implements TopologicalSort {
         int n = graph.getNumVertices();
         List<Integer> result = new ArrayList<>();
 
-        // Calculate in-degrees
         int[] inDegree = calculateInDegrees(graph, metrics);
 
-        // Initialize queue with vertices having in-degree 0
         Queue<Integer> queue = new LinkedList<>();
         for (int i = 0; i < n; i++) {
             if (inDegree[i] == 0) {
@@ -33,14 +27,12 @@ public class KahnTopologicalSort implements TopologicalSort {
             }
         }
 
-        // Process vertices in topological order
         while (!queue.isEmpty()) {
             int u = queue.poll();
             result.add(u);
             metrics.incrementCounter("queue_pops");
             metrics.incrementCounter("vertices_processed");
 
-            // Remove edges from u and update in-degrees
             for (Graph.Edge edge : graph.getEdges(u)) {
                 int v = edge.to;
                 inDegree[v]--;
@@ -55,10 +47,9 @@ public class KahnTopologicalSort implements TopologicalSort {
 
         metrics.stopTiming("kahn_topological_sort");
 
-        // Check if topological sort is possible (no cycles)
         if (result.size() != n) {
             metrics.incrementCounter("cycle_detected");
-            return null; // Graph has cycles
+            return null;
         }
 
         return result;
@@ -71,13 +62,6 @@ public class KahnTopologicalSort implements TopologicalSort {
         return topoOrder != null;
     }
 
-    /**
-     * Calculate in-degrees for all vertices.
-     * 
-     * @param graph   the graph
-     * @param metrics metrics tracker
-     * @return array of in-degrees
-     */
     private int[] calculateInDegrees(Graph graph, Metrics metrics) {
         int n = graph.getNumVertices();
         int[] inDegree = new int[n];
@@ -92,12 +76,6 @@ public class KahnTopologicalSort implements TopologicalSort {
         return inDegree;
     }
 
-    /**
-     * Get detailed metrics summary for the last run.
-     * 
-     * @param metrics the metrics object used
-     * @return formatted metrics string
-     */
     public String getMetricsSummary(Metrics metrics) {
         StringBuilder sb = new StringBuilder();
         sb.append("=== Kahn's Topological Sort Metrics ===\n");

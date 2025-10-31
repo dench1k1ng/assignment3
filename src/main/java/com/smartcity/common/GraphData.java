@@ -3,9 +3,7 @@ package com.smartcity.common;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
-
 public class GraphData {
-
 
     public static class EdgeData {
         @JsonProperty("u")
@@ -45,11 +43,6 @@ public class GraphData {
     public GraphData() {
     }
 
-    /**
-     * Convert to Graph object.
-     * 
-     * @return Graph instance
-     */
     public Graph toGraph() {
         Graph graph = new Graph(numVertices, directed);
 
